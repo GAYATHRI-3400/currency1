@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Currency Converter</title>
+    <style>
+        /* SCSS compiled CSS */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        h2 {
+            color: #333;
+            text-align: center;
+        }
+
+        select, input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            font-size: 16px;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .result {
+            margin-top: 20px;
+            font-size: 18px;
+            color: #555;
+        }
+
+        .history {
+            margin-top: 30px;
+        }
+
+        .history ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .history li {
+            background-color: #f1f1f1;
+            padding: 8px;
+            margin: 5px 0;
+            border-radius: 5px;
+        }
+
+        /* Responsive design */
+        @media (max-width: 600px) {
+            .container {
+                padding: 15px;
+            }
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2 id="header">Currency Converter</h2>
+
+        <select id="language" onchange="changeLanguage()">
+            <option value="en">English</option>
+            <option value="es">Español</option>
+            <option value="fr">Français</option>
+        </select>
+
+        <input type="number" id="amount" placeholder="Enter amount" />
+
+        <select id="fromCurrency">
+            <option value="USD">USD</option>
+            <option value="EUR">EUR</option>
+            <option value="INR">INR</option>
+            <option value="GBP">GBP</option>
+            <option value="JPY">JPY</option>
+            <option value="AUD">AUD</option>
+            <option value="CAD">CAD</option>
+        </select>
+
+        <select id="toCurrency">
+            <option value="USD">USD</option>
+            <option value="EUR">EUR</option>
+            <option value="INR">INR</option>
+            <option value="GBP">GBP</option>
+            <option value="JPY">JPY</option>
+            <option value="AUD">AUD</option>
+            <option value="CAD">CAD</option>
+        </select>
+
+        <button onclick="convertCurrency()">Convert</button>
+
+        <div class="result" id="result"></div>
+
+        <div class="history" id="history">
+            <h3>Conversion History</h3>
+            <ul id="historyList"></ul>
+        </div>
+    </div>
+
+    <script>
+        const exchangeRates = {
+            "USD": { "EUR": 0.94, "INR": 83.32, "GBP": 0.81, "JPY": 148.72, "AUD": 1.47, "CAD": 1.36, "USD": 1 },
+            "EUR": { "USD": 1.06, "INR": 88.85, "GBP": 0.86, "JPY": 158.33, "AUD": 1.56, "CAD": 1.44, "EUR": 1 },
+            "INR": { "USD": 0.012, "EUR": 0.011, "GBP": 0.0097, "JPY": 1.79, "AUD": 0.018, "CAD": 0.016, "INR": 1 },
+            "GBP": { "USD": 1.24, "EUR": 1.17, "INR": 103.23, "JPY": 184.85, "AUD": 1.81, "CAD": 1.59, "GBP": 1 },
+            "JPY": { "USD": 0.0067, "EUR": 0.0063, "INR": 0.56, "GBP": 0.0054, "AUD": 0.0098, "CAD": 0.0091, "JPY": 1 },
+            "AUD": { "USD": 0.68, "EUR": 0.64, "INR": 56.37, "GBP": 0.55, "JPY": 102.10, "CAD": 0.92, "AUD": 1 },
+            "CAD": { "USD": 0.74, "EUR": 0.69, "INR": 61.65, "GBP": 0.63, "JPY": 110.85, "AUD": 1.09, "CAD": 1 }
+        };
+
+        let conversionHistory = [];
+
+        function convertCurrency() {
+            const amount = document.getElementById("amount").value;
+            const fromCurrency = document.getElementById("fromCurrency").value;
+            const toCurrency = document.getElementById("toCurrency").value;
+
+            if (amount === "" || isNaN(amount)) {
+                alert("Please enter a valid amount");
+                return;
+            }
+
+            const result = amount * exchangeRates[fromCurrency][toCurrency];
+            const resultText = `${amount} ${fromCurrency} = ${result.toFixed(2)} ${toCurrency}`;
+            
+            document.getElementById("result").innerText = resultText;
+
+            // Add to history
+            conversionHistory.push(resultText);
+            updateHistory();
+        }
+
+        function updateHistory() {
+            const historyList = document.getElementById("historyList");
+            historyList.innerHTML = '';
+            conversionHistory.slice(-5).forEach(entry => {
+                const listItem = document.createElement('li');
+                listItem.textContent = entry;
+                historyList.appendChild(listItem);
+            });
+        }
+
+        function changeLanguage() {
+            const language = document.getElementById("language").value;
+
+            if (language === "es") {
+                document.getElementById("header").innerText = "Conversor de Divisas";
+            } else if (language === "fr") {
+                document.getElementById("header").innerText = "Convertisseur de Devises";
+            } else {
+                document.getElementById("header").innerText = "Currency Converter";
+            }
+        }
+    </script>
+
+</body>
+</html>
